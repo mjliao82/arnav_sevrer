@@ -1,1 +1,9 @@
 hello
+
+
+git add .
+
+git commit -m"note of the update"
+
+git push 
+allows you to upload
