@@ -1,0 +1,54 @@
+const ws = new WebSocket(`ws://${window.location.host}`);
+
+ws.onopen = () => {
+  console.log('Connected to WebSocket server');
+};
+
+ws.onmessage = (event) => {
+  const msgDiv = document.getElementById('messages');
+  const data = JSON.parse(event.data);
+  msgDiv.innerHTML += `<p><strong>${data.type}</strong>: ${data.content}</p>`;
+};
+
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const message = {
+    type: 'chat',
+    id: Date.now(),
+    content: input.value
+  };
+  ws.send(JSON.stringify(message));
+  input.value = '';
+}
+
+function sendName() {
+  const name  = document.getElementById('nameInput');
+  const passwordInput = document.getElementById('passwordInput')
+  const game_tag = {
+    type: 'login',
+    id: Date.now(),
+    content: name.value
+  };    
+  const password = {
+    type: 'password',
+    id: Date.now(),
+    content: passwordInput.value
+  };
+  ws.send(JSON.stringify(password));
+  ws.send(JSON.stringify(game_tag));
+  name.value = '';
+  passwordInput.value= '';
+}
+
+function sendAll() {
+  const name  = document.getElementById('nameInput');
+  const passwordInput = document.getElementById('passwordInput')
+  const login_info = {
+    type: 'all_login_info',
+    id: Date.now(),
+    content: [name.value, passwordInput.value]
+  }
+  ws.send(JSON.stringify(login_info));
+  name.value = '';
+  passwordInput.value = '';
+}
