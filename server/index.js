@@ -28,12 +28,18 @@ wss.on('connection', (ws) => {
         ws.send(JSON.stringify(response));
       }
       else if (data.type == 'all_login_info') {
+        console.log("Recieved Info")
         const check = {
-            type: 'acknowledgement',
-            id: data.id,
-          content: `Server received: ${data.content}`
+          type: 'acknowledgement',
+          id: data.id,
+          content: data.content,
         };
-        console.log("New user:", data)
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify(check));
+          }
+        });
+        console.log(`New user:`, data.content)
       }
     } catch (e) {
       console.error('Error parsing message:', e);
