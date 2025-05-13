@@ -1,11 +1,11 @@
 Arnav: 
 
-  Look up how to get ssh key and add to your github
-  Clone the repo, your code is in the master branch(Default branch).
-  You can clone your repo, open it in VS code
-
-
 **Git commands**
+git fetch origin 
+
+  - allows you to detect updates on the github repo
+  - on success, it will tell you the newly created branch, or if there is any recent commit to the branch.
+  - after this, if there is new code. run git pull
 
 git pull 
   - allows you to retrieve updated code from the repo
