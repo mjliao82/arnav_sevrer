@@ -1,6 +1,8 @@
 Arnav: 
 
 **Git commands**
+
+
 git fetch origin 
 
   - allows you to detect updates on the github repo
