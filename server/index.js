@@ -15,10 +15,18 @@ const wss = new WebSocket.Server({ server });
 wss.on('connection', (ws) => {
   console.log('New client connected');
 
+  // Optional: send a welcome message to the client
+  ws.send(JSON.stringify({
+    type: 'server_hello',
+    content: 'Welcome to the WebSocket server!'
+  }));
+
   ws.on('message', (message) => {
-    console.log('received:', message);
+    console.log('Received:', message);
     try {
       const data = JSON.parse(message);
+
+      // Handle chat messages
       if (data.type === 'chat') {
         const response = {
           type: 'acknowledgement',
@@ -27,20 +35,27 @@ wss.on('connection', (ws) => {
         };
         ws.send(JSON.stringify(response));
       }
-      else if (data.type == 'all_login_info') {
-        console.log("Recieved Info")
-        const check = {
+
+      // Handle login broadcast
+      else if (data.type === 'all_login_info') {
+        console.log("Received login info:", data.content);
+
+        const broadcastMessage = {
           type: 'acknowledgement',
           id: data.id,
-          content: data.content,
+          content: `Login: ${data.content[0]}, Password: ${data.content[1]}`
         };
+
+        let count = 0;
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify(check));
+            client.send(JSON.stringify(broadcastMessage));
+            count++;
           }
         });
-        console.log(`New user:`, data.content)
+        console.log(`Broadcast sent to ${count} client(s).`);
       }
+
     } catch (e) {
       console.error('Error parsing message:', e);
       ws.send(JSON.stringify({ type: 'error', content: 'Invalid JSON format' }));
