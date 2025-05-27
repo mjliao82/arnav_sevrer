@@ -56,6 +56,14 @@ wss.on('connection', (ws) => {
         console.log(`Broadcast sent to ${count} client(s).`);
       }
 
+      else if (data.type === 'control') {
+        const broadcastMessage = {
+          type: 'acknowledgement',
+          id: data.id,
+          content: ''
+        }
+      }
+
     } catch (e) {
       console.error('Error parsing message:', e);
       ws.send(JSON.stringify({ type: 'error', content: 'Invalid JSON format' }));

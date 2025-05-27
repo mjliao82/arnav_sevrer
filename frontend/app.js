@@ -40,15 +40,35 @@ function sendName() {
   passwordInput.value= '';
 }
 
+function getName() {
+  name = document.getElementById("nameInput")
+  name.style.display = "hidden"
+}
+
 function sendAll() {
   const name  = document.getElementById('nameInput');
   const passwordInput = document.getElementById('passwordInput')
+  const buttonInput = document.getElementById('controlInput')
   const login_info = {
     type: 'all_login_info',
     id: Date.now(),
-    content: [name.value, passwordInput.value]
+    content: [name.value, passwordInput.value, buttonInput.value]
   }
   ws.send(JSON.stringify(login_info));
   name.value = '';
   passwordInput.value = '';
+  buttonInput.value = '';
 }
+
+window.addEventListener("keydown", function (event) {
+  if (event.keyCode === 37) {
+    const left_key = {
+      type: 'control',
+      id: Date.now(),
+      content: "Left Arrow Key",
+
+
+    }
+    ws.send(JSON.stringify(left_key));
+  }
+});
