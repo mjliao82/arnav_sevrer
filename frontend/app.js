@@ -23,21 +23,13 @@ function sendMessage() {
 
 function sendName() {
   const name  = document.getElementById('nameInput');
-  const passwordInput = document.getElementById('passwordInput')
   const game_tag = {
     type: 'login',
     id: Date.now(),
     content: name.value
   };    
-  const password = {
-    type: 'password',
-    id: Date.now(),
-    content: passwordInput.value
-  };
-  ws.send(JSON.stringify(password));
   ws.send(JSON.stringify(game_tag));
   name.value = '';
-  passwordInput.value= '';
 }
 
 function getName() {

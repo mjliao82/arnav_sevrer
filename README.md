@@ -27,3 +27,6 @@ git commit -m"note of the update"
 
 git push 
 
+**Do Before npm run start**
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass

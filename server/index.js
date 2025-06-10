@@ -37,13 +37,13 @@ wss.on('connection', (ws) => {
       }
 
       // Handle login broadcast
-      else if (data.type === 'all_login_info') {
+      else if (data.type === 'login') {
         console.log("Received login info:", data.content);
 
         const broadcastMessage = {
           type: 'acknowledgement',
           id: data.id,
-          content: `Login: ${data.content[0]}, Password: ${data.content[1]}`
+          content: `New User: ${data.content}`
         };
 
         let count = 0;
