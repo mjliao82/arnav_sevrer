@@ -25,6 +25,7 @@ wss.on('connection', (ws) => {
     console.log('Received:', message);
     try {
       const data = JSON.parse(message);
+      console.log(data.type)
 
       // Handle chat messages
       if (data.type === 'chat') {
@@ -50,6 +51,24 @@ wss.on('connection', (ws) => {
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify(broadcastMessage));
+            count++;
+          }
+        });
+        console.log(`Broadcast sent to ${count} client(s).`);
+      }
+      else if (data.type === 'keypressed') {
+        console.log("Received input info:", data.key);
+
+        const broadcastInput = {
+          type: 'acknowledgement',
+          id: data.id,
+          content: `${data.name}: ${data.key}`
+        };
+
+        let count = 0;
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(broadcastInput));
             count++;
           }
         });
