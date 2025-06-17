@@ -22,19 +22,20 @@ function sendMessage() {
 }
 
 function sendName() {
-  const name  = document.getElementById('nameInput');
+  const name = document.getElementById('nameInput');
+  const send_button = document.getElementById('send_button')
   const game_tag = {
     type: 'login',
     id: Date.now(),
     content: name.value
   };    
   ws.send(JSON.stringify(game_tag));
-  name.value = '';
+  hide(name);
+  hide(send_button)
 }
 
-function getName() {
-  name = document.getElementById("nameInput")
-  name.style.display = "hidden"
+function hide(object) {
+  object.style.display = 'none'
 }
 
 function sendAll() {
