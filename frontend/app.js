@@ -1,5 +1,6 @@
 const ws = new WebSocket(`ws://${window.location.host}`);
 
+
 ws.onopen = () => {
   console.log('Connected to WebSocket server');
 };
@@ -15,7 +16,7 @@ function sendMessage() {
   const message = {
     type: 'chat',
     id: Date.now(),
-    content: input.value
+    content: input.value,
   };
   ws.send(JSON.stringify(message));
   input.value = '';
@@ -28,11 +29,68 @@ function sendName() {
     type: 'login',
     id: Date.now(),
     content: name.value
+
   };    
   ws.send(JSON.stringify(game_tag));
   hide(name);
-  hide(send_button)
+  hide(send_button);
+  document.addEventListener('keydown', function(event) {
+    // Access the key that was pressed
+    //const key = event.key;
+    const keyCode = event.code;
+  
+    // Check for specific keys
+    // if (key === 'Enter') {
+    //   console.log('Enter key pressed!');
+    // }
+    if (keyCode === 'ArrowUp') {
+      const input = {
+        type: 'keypressed',
+        id: Date.now(),
+        key: keyCode,
+        name: name.value
+      };
+      ws.send(JSON.stringify(input))
+    }
+    if (keyCode === 'ArrowDown') {
+      const input = {
+        type: 'keypressed',
+        id: Date.now(),
+        key: keyCode,
+        name: name.value
+      };
+      ws.send(JSON.stringify(input))
+    }
+    if (keyCode === 'ArrowLeft') {
+      const input = {
+        type: 'keypressed',
+        id: Date.now(),
+        key: keyCode,
+        name: name.value
+      };
+      ws.send(JSON.stringify(input))
+    }
+    if (keyCode === 'ArrowRight') {
+      const input = {
+        type: 'keypressed',
+        id: Date.now(),
+        key: keyCode,
+        name: name.value
+      };
+      ws.send(JSON.stringify(input))
+    }
+    if (keyCode === 'Space') {
+      const input = {
+        type: 'keypressed',
+        id: Date.now(),
+        key: keyCode,
+        name: name.value
+      };
+      ws.send(JSON.stringify(input))
+    }
+  });
 }
+
 
 function hide(object) {
   object.style.display = 'none'
@@ -53,15 +111,3 @@ function sendAll() {
   buttonInput.value = '';
 }
 
-window.addEventListener("keydown", function (event) {
-  if (event.keyCode === 37) {
-    const left_key = {
-      type: 'control',
-      id: Date.now(),
-      content: "Left Arrow Key",
-
-
-    }
-    ws.send(JSON.stringify(left_key));
-  }
-});

@@ -9,6 +9,8 @@ const port = 3000;
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 
+
+
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
@@ -42,9 +44,9 @@ wss.on('connection', (ws) => {
         console.log("Received login info:", data.content);
 
         const broadcastMessage = {
-          type: 'acknowledgement',
+          type: 'New User',
           id: data.id,
-          content: `New User: ${data.content}`
+          content: `${data.content}`
         };
 
         let count = 0;
@@ -60,7 +62,7 @@ wss.on('connection', (ws) => {
         console.log("Received input info:", data.key);
 
         const broadcastInput = {
-          type: 'acknowledgement',
+          type: 'Key Input',
           id: data.id,
           content: `${data.name}: ${data.key}`
         };
