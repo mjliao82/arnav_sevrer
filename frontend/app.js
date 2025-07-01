@@ -1,4 +1,4 @@
-const ws = new WebSocket(`ws://${window.location.host}`);
+const ws = new WebSocket(`wss://${window.location.host}`);
 
 
 ws.onopen = () => {
@@ -10,6 +10,14 @@ ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
   msgDiv.innerHTML += `<p><strong>${data.type}</strong>: ${data.content}</p>`;
 };
+
+const input_field = document.getElementById("nameInput");
+input_field.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+      event.preventDefault(); // Prevents default form submission, for example
+      sendName();
+  }
+});
 
 function sendMessage() {
   const input = document.getElementById('msgInput');
