@@ -3,33 +3,39 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 
+// === Setup Express ===
 const app = express();
 const port = 3000;
-
-// Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
-
-
-
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-wss.on('connection', (ws) => {
-  console.log('New client connected');
+// === Connect to Python WebSocket Server ===
+const pythonSocket = new WebSocket('ws://localhost:3000');
 
-  // Optional: send a welcome message to the client
+pythonSocket.on('open', () => {
+  console.log("Connected to Python WebSocket server");
+});
+
+pythonSocket.on('error', (err) => {
+  console.error("Failed to connect to Python WebSocket server:", err.message);
+});
+
+// === Handle incoming frontend connections ===
+wss.on('connection', (ws) => {
+  console.log('New frontend client connected');
+
   ws.send(JSON.stringify({
     type: 'server_hello',
     content: 'Welcome to the WebSocket server!'
   }));
 
   ws.on('message', (message) => {
-    console.log('Received:', message);
+    console.log('Received from frontend:', message);
     try {
       const data = JSON.parse(message);
-      console.log(data.type)
 
-      // Handle chat messages
+      // Handle chat
       if (data.type === 'chat') {
         const response = {
           type: 'acknowledgement',
@@ -39,63 +45,48 @@ wss.on('connection', (ws) => {
         ws.send(JSON.stringify(response));
       }
 
-      // Handle login broadcast
+      // Forward login to Python
       else if (data.type === 'login') {
-        console.log("Received login info:", data.content);
+        console.log("Login:", data.content);
 
-        const broadcastMessage = {
-          type: 'New User',
+        const toPython = {
+          type: 'login',
           id: data.id,
-          content: `${data.content}`
+          content: data.content
         };
 
-        let count = 0;
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(broadcastMessage));
-            count++;
-          }
-        });
-        console.log(`Broadcast sent to ${count} client(s).`);
+        if (pythonSocket.readyState === WebSocket.OPEN) {
+          pythonSocket.send(JSON.stringify(toPython));
+        }
       }
+
+      // Forward keypress to Python
       else if (data.type === 'keypressed') {
-        console.log("Received input info:", data.key);
+        console.log("Keypress:", data.key);
 
-        const broadcastInput = {
-          type: 'Key Input',
+        const toPython = {
+          type: 'keypressed',
           id: data.id,
-          content: `${data.name}: ${data.key}`
+          key: data.key,
+          name: data.name
         };
 
-        let count = 0;
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(broadcastInput));
-            count++;
-          }
-        });
-        console.log(`Broadcast sent to ${count} client(s).`);
-      }
-
-      else if (data.type === 'control') {
-        const broadcastMessage = {
-          type: 'acknowledgement',
-          id: data.id,
-          content: ''
+        if (pythonSocket.readyState === WebSocket.OPEN) {
+          pythonSocket.send(JSON.stringify(toPython));
         }
       }
 
     } catch (e) {
-      console.error('Error parsing message:', e);
+      console.error('Invalid JSON:', e);
       ws.send(JSON.stringify({ type: 'error', content: 'Invalid JSON format' }));
     }
   });
 
   ws.on('close', () => {
-    console.log('Client disconnected');
+    console.log('Frontend client disconnected');
   });
 });
 
 server.listen(port, () => {
-  console.log(`Server is listening on http://localhost:${port}`);
+  console.log(`WebSocket server listening at http://localhost:${port}`);
 });
