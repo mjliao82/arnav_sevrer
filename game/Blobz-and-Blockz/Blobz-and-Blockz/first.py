@@ -33,6 +33,15 @@ player_img = pygame.image.load("super_super_drippy.jpg").convert()
 player_rect = pygame.transform.scale(player_img, (PLAYER_SIZE, PLAYER_SIZE))
 player = player_rect.get_rect(topleft=(player_x, player_y))
 
+# Creates second player
+player2_x = 350
+player2_y = 100
+player2_velocity = 0
+player2_on_ground = False
+player2_img = pygame.image.load("image.jpg").convert()
+player2_rect = pygame.transform.scale(player2_img, (PLAYER_SIZE, PLAYER_SIZE))
+player2 = player2_rect.get_rect(topleft=(player2_x, player2_y))
+
 # Create the ground
 ground_x = 0
 ground_y = 400
@@ -102,6 +111,14 @@ while running:
         import fifth
     if keys[pygame.K_ESCAPE]:
         running = False
+    if keys[pygame.K_a]:
+        player2.x -= MOVE_SPEED
+    if keys[pygame.K_d]:
+        player2.x += MOVE_SPEED
+    if keys[pygame.K_SPACE]:
+        import instructions
+    if keys[pygame.K_ESCAPE]:
+        running = False
 
 
     # Apply gravity
@@ -117,6 +134,24 @@ while running:
         player_on_ground = True
         player_velocity = 0
 
+     # Jump control (using the up arrow key)
+    if keys[pygame.K_UP] and player_on_ground:
+        player_velocity = JUMP_STRENGTH
+        player_on_ground = False
+
+    # Apply gravity
+    if not player2_on_ground:
+        player2_velocity += GRAVITY
+
+    # Update player's vertical position
+    player2.y += player2_velocity
+
+    # Check for collisions with the ground
+    if player2.colliderect(ground):
+        player2.y = ground.y - PLAYER_SIZE
+        player2_on_ground = True
+        player2_velocity = 0
+
     # Check for collisions with the platform
     if (player.y < platform_1_y and player.y > (platform_1_y - 40)) and (player.x > platform_1_x and player.x < platform_1_x + 190):
        player.y = platform_1.y - PLAYER_SIZE
@@ -127,6 +162,17 @@ while running:
        player.y = platform_2.y - PLAYER_SIZE
        player_on_ground = True
        player_velocity = 0
+
+    #Check for second player collisions with the platform
+    if (player2.y < platform_1_y and player2.y > (platform_1_y - 40)) and (player2.x > platform_1_x and player2.x < platform_1_x + 190):
+       player2.y = platform_1.y - PLAYER_SIZE
+       player2_on_ground = True
+       player2_velocity = 0
+
+    if (player2.y < platform_2_y and player2.y > (platform_2_y - 40)) and (player2.x > platform_2_x and player2.x < platform_2_x + 190):
+       player2.y = platform_2.y - PLAYER_SIZE
+       player2_on_ground = True
+       player2_velocity = 0
 
     if player.x < 1:
         player.x += push
@@ -147,13 +193,38 @@ while running:
 
     if coins == 3:
         GOAL_COLOR = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-        if player.colliderect(goal):
+        if player.colliderect(goal) and player2.colliderect(goal):
             import next_2
+
+
+
+    if player2.x < 1:
+        player2.x += push
+
+    elif player2.x > 1059:
+        player2.x -= push
+
+    # Check for collisions with coins
+    if player2.colliderect(coin_rect_1):
+        coins += 1
+        coin_rect_1.x = 2000
+    if player2.colliderect(coin_rect_2):
+        coins += 1
+        coin_rect_2.x = 2000
+    if player2.colliderect(coin_rect_3):
+        coins += 1
+        coin_rect_3.x = 2000
+
 
     # Jump control (using the up arrow key)
     if keys[pygame.K_UP] and player_on_ground:
         player_velocity = JUMP_STRENGTH
         player_on_ground = False
+
+    # Jump control second (using the up arrow key)
+    if keys[pygame.K_w] and player2_on_ground:
+        player2_velocity = JUMP_STRENGTH
+        player2_on_ground = False
 
     # Clear the screen
     screen.fill(BG_COLOR)
@@ -170,6 +241,9 @@ while running:
 
     # Draw the player
     pygame.draw.rect(screen, PLAYER_COLOR, player)
+
+    # Draw the second player
+    pygame.draw.rect(screen, PLAYER_COLOR, player2)
 
     #Display lives
     lives_text = font.render(f'Lives: {lives}', True, (0, 0, 0))
@@ -188,6 +262,8 @@ while running:
 
     # Draw the player
     screen.blit(player_rect, player)
+    # Draw the second player
+    screen.blit(player2_rect, player2)
 
     # Update the display
     pygame.display.update()

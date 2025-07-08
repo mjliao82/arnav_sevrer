@@ -28,6 +28,15 @@ player_img = pygame.image.load("super_super_drippy.jpg").convert()
 player_rect = pygame.transform.scale(player_img, (PLAYER_SIZE, PLAYER_SIZE))
 player = player_rect.get_rect(topleft=(player_x, player_y))
 
+# Creates second player
+player2_x = 350
+player2_y = 100
+player2_velocity = 0
+player2_on_ground = False
+player2_img = pygame.image.load("image.jpg").convert()
+player2_rect = pygame.transform.scale(player2_img, (PLAYER_SIZE, PLAYER_SIZE))
+player2 = player2_rect.get_rect(topleft=(player2_x, player2_y))
+
 # Create the ground
 ground_x = 0
 ground_y = 400
@@ -56,6 +65,14 @@ while running:
         import instructions
     if keys[pygame.K_ESCAPE]:
         running = False
+    if keys[pygame.K_a]:
+        player2.x -= MOVE_SPEED
+    if keys[pygame.K_d]:
+        player2.x += MOVE_SPEED
+    if keys[pygame.K_SPACE]:
+        import instructions
+    if keys[pygame.K_ESCAPE]:
+        running = False
 
     # Apply gravity
     if not player_on_ground:
@@ -74,6 +91,24 @@ while running:
     if keys[pygame.K_UP] and player_on_ground:
         player_velocity = JUMP_STRENGTH
         player_on_ground = False
+
+    # Apply gravity
+    if not player2_on_ground:
+        player2_velocity += GRAVITY
+
+    # Update player's vertical position
+    player2.y += player2_velocity
+
+    # Check for collisions with the ground
+    if player2.colliderect(ground):
+        player2.y = ground.y - PLAYER_SIZE
+        player2_on_ground = True
+        player2_velocity = 0
+
+    # Jump control (using the up arrow key)
+    if keys[pygame.K_w] and player2_on_ground:
+        player2_velocity = JUMP_STRENGTH
+        player2_on_ground = False
         
 
     # Clear the screen
@@ -84,6 +119,9 @@ while running:
 
     # Draw the player
     screen.blit(player_rect, player)
+
+    # Draw the second player
+    screen.blit(player2_rect, player2)
 
     # Display game title
     text_1 = "WELCOME TO"

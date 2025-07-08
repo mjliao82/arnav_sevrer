@@ -28,7 +28,7 @@ LITTLE_JUMP = -4
 # Create the screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Platformer")
-lives = 1000000
+lives = 3
 coins = 0
 
 # Create the player character
@@ -187,8 +187,20 @@ while running:
         if lives == 0:
             import end
 
-    if player.colliderect(goal):
-        import win
+    if player.colliderect(coin_rect_1):
+        coins += 1
+        coin_rect_1.x = 2000
+    if player.colliderect(coin_rect_2):
+        coins += 1
+        coin_rect_2.x = 2000
+    if player.colliderect(coin_rect_3):
+        coins += 1
+        coin_rect_3.x = 2000
+
+    if coins == 3:
+        GOAL_COLOR = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        if player.colliderect(goal):
+            import win
 
     if player.colliderect(enemy):
         lives -= 1
