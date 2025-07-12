@@ -26,6 +26,11 @@ EXTRA_JUMP = -18
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Platformer")
 
+one_player_done = False
+
+player_gone = False
+player2_gone = False
+
 player_x = 150
 player_y = 100
 player_velocity = 0
@@ -33,6 +38,15 @@ player_on_ground = False
 player_img = pygame.image.load("super_super_drippy.jpg").convert()
 player_rect = pygame.transform.scale(player_img, (PLAYER_SIZE, PLAYER_SIZE))
 player = player_rect.get_rect(topleft=(player_x, player_y))
+
+# Creates second player
+player2_x = 150
+player2_y = 100
+player2_velocity = 0
+player2_on_ground = False
+player2_img = pygame.image.load("image.jpg").convert()
+player2_rect = pygame.transform.scale(player2_img, (PLAYER_SIZE, PLAYER_SIZE))
+player2 = player2_rect.get_rect(topleft=(player2_x, player2_y))
 
 # Create the ground
 ground_x = 0
@@ -104,16 +118,20 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-        #if event.type == pygame.MOUSEBUTTONUP:
-            #pos = pygame.mouse.get_pos()
-            #print(pos)
-
     # Handle player controls
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         player.x -= MOVE_SPEED
     if keys[pygame.K_RIGHT]:
         player.x += MOVE_SPEED
+    if keys[pygame.K_ESCAPE]:
+        running = False
+    if keys[pygame.K_a]:
+        player2.x -= MOVE_SPEED
+    if keys[pygame.K_d]:
+        player2.x += MOVE_SPEED
+    if keys[pygame.K_SPACE]:
+        import instructions
     if keys[pygame.K_ESCAPE]:
         running = False
 
@@ -123,6 +141,13 @@ while running:
 
     # Update player's vertical position
     player.y += player_velocity
+    
+    # Apply gravity
+    if not player2_on_ground:
+        player2_velocity += GRAVITY
+
+    # Update player's vertical position
+    player2.y += player2_velocity
 
     # Check for collisions with the ground
     if player.colliderect(ground):
@@ -140,11 +165,44 @@ while running:
     if player.colliderect(coin_rect_3):
         coins += 1
         coin_rect_3.x = 2000
+        
+    # Check for collisions with the ground
+    if player2.colliderect(ground):
+        player2.y = ground.y - PLAYER_SIZE
+        player2_on_ground = True
+        player2_velocity = 0
+        
+    # Check for collisions with coins
+    if player2.colliderect(coin_rect_1):
+        coins += 1
+        coin_rect_1.x = 2000
+    if player2.colliderect(coin_rect_2):
+        coins += 1
+        coin_rect_2.x = 2000
+    if player2.colliderect(coin_rect_3):
+        coins += 1
+        coin_rect_3.x = 2000
 
     if coins == 3:
         GOAL_COLOR = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-        if player.colliderect(goal):
-            import next_3
+
+        if player.colliderect(goal) and not player_gone:
+            if one_player_done:
+                import next_3
+            else:
+                one_player_done = True
+                player_gone = True
+                player.x = -1000  # move offscreen
+                player.y = -1000
+
+        if player2.colliderect(goal) and not player2_gone:
+            if one_player_done:
+                import next_3
+            else:
+                one_player_done = True
+                player2_gone = True
+                player2.x = -1000  # move offscreen
+                player2.y = -1000
 
     if player.colliderect(jumppad):
         player_velocity = EXTRA_JUMP
@@ -164,13 +222,34 @@ while running:
     elif player.x > 1059:
         player.x -= push
         
+    if player2.colliderect(jumppad):
+        player2_velocity = EXTRA_JUMP
+        player2_on_ground = False
 
-    
+    if player2.colliderect(spike_1) or player2.colliderect(spike_2):
+        lives -= 1
+        player2_x = 150
+        player2_y = 370
+        player2 = pygame.Rect(player2_x, player2_y, PLAYER_SIZE, PLAYER_SIZE)
+        if lives == 0:
+            import end
+
+    if player2.x < 1:
+        player2.x += push
+
+    elif player2.x > 1059:
+        player2.x -= push
+        
 
     # Jump control (using the up arrow key)
     if keys[pygame.K_UP] and player_on_ground:
         player_velocity = JUMP_STRENGTH
         player_on_ground = False
+        
+    # Jump control second (using the up arrow key)
+    if keys[pygame.K_w] and player2_on_ground:
+        player2_velocity = JUMP_STRENGTH
+        player2_on_ground = False
 
     # Clear the screen
     screen.fill(BG_COLOR)
@@ -188,6 +267,9 @@ while running:
 
     # Draw the player
     screen.blit(player_rect, player)
+    
+    # Draw the second player
+    screen.blit(player2_rect, player2)
 
     #Draw the jump pad
     pygame.draw.rect(screen, JUMPPAD_COLOR, jumppad)

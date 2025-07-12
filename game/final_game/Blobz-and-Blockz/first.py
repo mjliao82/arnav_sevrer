@@ -24,6 +24,11 @@ pygame.display.set_caption("Platformer")
 lives = 3
 coins = 0
 
+one_player_done = False
+
+player_gone = False
+player2_gone = False
+
 #Create the PLayer
 player_x = 350
 player_y = 100
@@ -117,8 +122,6 @@ while running:
         player2.x += MOVE_SPEED
     if keys[pygame.K_SPACE]:
         import instructions
-    if keys[pygame.K_ESCAPE]:
-        running = False
 
 
     # Apply gravity
@@ -193,8 +196,24 @@ while running:
 
     if coins == 3:
         GOAL_COLOR = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-        if player.colliderect(goal) and player2.colliderect(goal):
-            import next_2
+
+        if player.colliderect(goal) and not player_gone:
+            if one_player_done:
+                import next_2
+            else:
+                one_player_done = True
+                player_gone = True
+                player.x = -1000  # move offscreen
+                player.y = -1000
+
+        if player2.colliderect(goal) and not player2_gone:
+            if one_player_done:
+                import next_2
+            else:
+                one_player_done = True
+                player2_gone = True
+                player2.x = -1000  # move offscreen
+                player2.y = -1000
 
 
 
