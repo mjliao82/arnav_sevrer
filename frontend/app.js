@@ -1,121 +1,117 @@
-const ws = new WebSocket(`wss://${window.location.host}`);
-
+const ws = new WebSocket(`ws://${window.location.host}`);
 
 ws.onopen = () => {
-  console.log('Connected to WebSocket server');
+  console.log("Connected to WebSocket server");
 };
 
 ws.onmessage = (event) => {
-  const msgDiv = document.getElementById('messages');
+  const msgDiv = document.getElementById("messages");
   const data = JSON.parse(event.data);
   msgDiv.innerHTML += `<p><strong>${data.type}</strong>: ${data.content}</p>`;
 };
 
 const input_field = document.getElementById("nameInput");
-input_field.addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-      event.preventDefault(); // Prevents default form submission, for example
-      sendName();
+input_field.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault(); // Prevents default form submission, for example
+    sendName();
   }
 });
 
 function sendMessage() {
-  const input = document.getElementById('msgInput');
+  const input = document.getElementById("msgInput");
   const message = {
-    type: 'chat',
+    type: "chat",
     id: Date.now(),
     content: input.value,
   };
   ws.send(JSON.stringify(message));
-  input.value = '';
+  input.value = "";
 }
 
 function sendName() {
-  const name = document.getElementById('nameInput');
-  const send_button = document.getElementById('send_button')
+  const name = document.getElementById("nameInput");
+  const send_button = document.getElementById("send_button");
   const game_tag = {
-    type: 'login',
+    type: "login",
     id: Date.now(),
-    content: name.value
-
-  };    
+    content: name.value,
+  };
   ws.send(JSON.stringify(game_tag));
   hide(name);
   hide(send_button);
-  document.addEventListener('keydown', function(event) {
+  document.addEventListener("keydown", function (event) {
     // Access the key that was pressed
     //const key = event.key;
     const keyCode = event.code;
-  
+
     // Check for specific keys
     // if (key === 'Enter') {
     //   console.log('Enter key pressed!');
     // }
-    if (keyCode === 'ArrowUp') {
+    if (keyCode === "ArrowUp") {
       const input = {
-        type: 'keypressed',
+        type: "keypressed",
         id: Date.now(),
         key: keyCode,
-        name: name.value
+        name: name.value,
       };
-      ws.send(JSON.stringify(input))
+      ws.send(JSON.stringify(input));
     }
-    if (keyCode === 'ArrowDown') {
+    if (keyCode === "ArrowDown") {
       const input = {
-        type: 'keypressed',
+        type: "keypressed",
         id: Date.now(),
         key: keyCode,
-        name: name.value
+        name: name.value,
       };
-      ws.send(JSON.stringify(input))
+      ws.send(JSON.stringify(input));
     }
-    if (keyCode === 'ArrowLeft') {
+    if (keyCode === "ArrowLeft") {
       const input = {
-        type: 'keypressed',
+        type: "keypressed",
         id: Date.now(),
         key: keyCode,
-        name: name.value
+        name: name.value,
       };
-      ws.send(JSON.stringify(input))
+      ws.send(JSON.stringify(input));
     }
-    if (keyCode === 'ArrowRight') {
+    if (keyCode === "ArrowRight") {
       const input = {
-        type: 'keypressed',
+        type: "keypressed",
         id: Date.now(),
         key: keyCode,
-        name: name.value
+        name: name.value,
       };
-      ws.send(JSON.stringify(input))
+      ws.send(JSON.stringify(input));
     }
-    if (keyCode === 'Space') {
+    if (keyCode === "Space") {
       const input = {
-        type: 'keypressed',
+        type: "keypressed",
         id: Date.now(),
         key: keyCode,
-        name: name.value
+        name: name.value,
       };
-      ws.send(JSON.stringify(input))
+      ws.send(JSON.stringify(input));
     }
   });
 }
 
-
 function hide(object) {
-  object.style.display = 'none'
+  object.style.display = "none";
 }
 
 function sendAll() {
-  const name  = document.getElementById('nameInput');
-  const passwordInput = document.getElementById('passwordInput')
-  const buttonInput = document.getElementById('controlInput')
+  const name = document.getElementById("nameInput");
+  const passwordInput = document.getElementById("passwordInput");
+  const buttonInput = document.getElementById("controlInput");
   const login_info = {
-    type: 'all_login_info',
+    type: "all_login_info",
     id: Date.now(),
-    content: [name.value, passwordInput.value, buttonInput.value]
-  }
+    content: [name.value, passwordInput.value, buttonInput.value],
+  };
   ws.send(JSON.stringify(login_info));
-  name.value = '';
-  passwordInput.value = '';
-  buttonInput.value = '';
+  name.value = "";
+  passwordInput.value = "";
+  buttonInput.value = "";
 }
-

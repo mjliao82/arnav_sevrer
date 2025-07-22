@@ -4,7 +4,7 @@ import websockets
 import json
 
 async def listen():
-    uri = "ws://localhost:3000"  # Address of your Node.js server
+    uri = "ws://localhost:8080"  # Address of your Node.js server
     async with websockets.connect(uri) as websocket:
         print("Connected to Node.js WebSocket server")
 
